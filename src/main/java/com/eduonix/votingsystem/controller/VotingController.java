@@ -14,10 +14,14 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 //import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -51,7 +55,7 @@ public class VotingController {
         session.setAttribute("citizen", citizen);
         
         if(citizen.getHasVoted()){
-            return "/alreadyVoted.html";            
+            return "/alreadyVoted.html";             
         }
         else
         {
@@ -61,6 +65,22 @@ public class VotingController {
             return "/performVote.html";   
         }
         
+    }
+    
+    @RequestMapping(value = "/doLoginJs", method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<Citizen> doLoginJs(@RequestParam String name){        
+        logger.info("getting citizen from db");
+        
+        Citizen citizen = citizenRepo.findByName(name);
+        
+        logger.info("putting citizen into session");
+//        session.setAttribute("citizen", citizen);
+        
+//        return json
+// to test with postman: get http://localhost:8181/doLoginJs?name=oks
+            //return citizen; 
+            return new ResponseEntity<>(citizen, HttpStatus.OK);  
+
     }
     
     @RequestMapping("/voteFor")
