@@ -9,8 +9,35 @@ and open the template in the editor.
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--        <link href="main.css" rel="stylesheet" />-->
+        
+        <style>
+            ul{
+                list-style: none; 
+                margin: 0; 
+                padding: 0;
+                overflow: hidden;
+            }
+            li{
+                display: inline; 
+                float: left;
+            }
+            a{
+                text-decoration: none;
+            }
+        </style>
     </head>
     <body>
+        
+        <ul>
+            <li th:each="entry : ${breadcrumbs}">
+                <div th:if="${entry.url == '#'}"><span th:text="${entry.name}"></span></div>
+                <div th:if="${entry.url != '#'}">
+                    <a th:href="${entry.url}">><span th:text="${entry.name}"></span></a>
+                </div>
+            </li>
+        </ul>
+                
         <h1 style="color: red;"> You have already voted</h1>
     </body>
 </html>

@@ -5,6 +5,7 @@
  */
 package com.eduonix.votingsystem.controller;
 
+import com.eduonix.breadcrumbs.BreadCrumbsBuilder;
 import com.eduonix.votingsystem.entity.Candidate;
 import com.eduonix.votingsystem.entity.Citizen;
 import com.eduonix.votingsystem.repositories.CandidateRepo;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class VotingController {
     
     public final Logger logger = Logger.getLogger(VotingController.class);
+    public BreadCrumbsBuilder breadCrumbsBuilder = new BreadCrumbsBuilder();
     
     @Autowired
     CitizenRepo citizenRepo;
@@ -55,6 +57,8 @@ public class VotingController {
         session.setAttribute("citizen", citizen);
         
         if(citizen.getHasVoted()){
+            logger.info("add breadcrumbs");
+            model.addAttribute("breadcrumbs", breadCrumbsBuilder.getBreadcrumbs());
             return "/alreadyVoted.html";             
         }
         else
@@ -62,6 +66,8 @@ public class VotingController {
             logger.info("putting candidates into model");
             List<Candidate> candidates = candidateRepo.findAll();            
             model.addAttribute("candidates", candidates);
+            
+            model.addAttribute("breadcrumbs", breadCrumbsBuilder.getBreadcrumbs());
             return "/performVote.html";   
         }
         
@@ -84,8 +90,9 @@ public class VotingController {
     }
     
     @RequestMapping("/voteFor")
-    public String voteFor(@RequestParam Long id, HttpSession session){
+    public String voteFor(@RequestParam Long id, Model model, HttpSession session){
         Citizen ct = (Citizen)session.getAttribute("citizen");
+        logger.info("in voteFor");  
         
         if(!ct.getHasVoted()){
             ct.setHasVoted(true);
@@ -97,8 +104,17 @@ public class VotingController {
             candidateRepo.save(c);            
             citizenRepo.save(ct);
             
+            model.addAttribute("breadcrumbs", breadCrumbsBuilder.getBreadcrumbs());
+            
             return "voted.html";
-        }        
+        }
+        model.addAttribute("breadcrumbs", breadCrumbsBuilder.getBreadcrumbs());
+
         return "alreadyVoted.html";        
     }
+
+    public VotingController() {
+        breadCrumbsBuilder = new BreadCrumbsBuilder();
+    }
+    
 }
